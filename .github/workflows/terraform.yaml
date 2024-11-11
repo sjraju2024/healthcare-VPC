@@ -1,0 +1,63 @@
+name: Terraform CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: self-hosted
+
+    steps:
+     
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14' 
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: '1.5.0'
+          
+      - name: List files in env directory
+        run: ls -l ./Terraform/env
+        
+      - name: List files in Terraform directory
+        run: ls -R ./Terraform 
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./Terraform
+        
+
+      - name: Run terraform get to download modules
+        run: terraform get
+        
+        
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Run Terraform Plan with Debug Logging
+        run: terraform plan -out=tfplan -var-file=./Terraform/env/dev.tfvars
+        env:
+          TF_LOG: DEBUG
+          TF_LOG_PATH: terraform_debug.log  # Logs to a file for debugging
+        working-directory: ./Terraform
+       
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
