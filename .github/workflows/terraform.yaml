@@ -26,12 +26,6 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: '1.5.0'
-          
-      - name: List files in env directory
-        run: ls -l ./Terraform/env
-        
-      - name: List files in Terraform directory
-        run: ls -R ./Terraform 
 
       - name: Terraform Init
         run: terraform init
