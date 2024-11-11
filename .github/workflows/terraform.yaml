@@ -29,13 +29,10 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./Terraform
         
-
       - name: Run terraform get to download modules
         run: terraform get
-        
-        
+          
       - name: Terraform Format
         run: terraform fmt -check
 
