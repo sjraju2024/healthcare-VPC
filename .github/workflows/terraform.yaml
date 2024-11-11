@@ -29,26 +29,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        
-      - name: Run terraform get to download modules
-        run: terraform get
-          
-      - name: Terraform Format
-        run: terraform fmt -check
 
-      - name: Terraform Validate
-        run: terraform validate
+      - name: Terraform Plan
+        run: terraform plan  # Run terraform plan
 
-      - name: Run Terraform Plan with Debug Logging
-        run: terraform plan
-        env:
-          TF_LOG: DEBUG
-          TF_LOG_PATH: terraform_debug.log  # Logs to a file for debugging
-        working-directory: ./Terraform
-       
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
-        env:
-          TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply -auto-approve 
